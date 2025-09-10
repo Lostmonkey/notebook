@@ -1,0 +1,27 @@
+.layout-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background-color: var(--colorNeutralBackground2);
+}
+
+.layout-sidebar {
+  width: 320px;
+  min-width: 280px;
+  max-width: 400px;
+  border-right: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
+  background-color: var(--colorNeutralBackground1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow4);
+  resize: horizontal;
+  overflow-x: hidden;
+}
+
+.layout-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--colorNeutralBackground2);
+}

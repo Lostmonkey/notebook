@@ -27,11 +27,6 @@ const noteSchema = new mongoose.Schema({
     required: [true, '用户ID是必需的'],
     index: true
   },
-  order: {
-    type: Number,
-    required: true,
-    default: 0
-  }
 }, {
   timestamps: true,
   collection: 'notes'
@@ -39,7 +34,6 @@ const noteSchema = new mongoose.Schema({
 
 // 创建复合索引
 noteSchema.index({ userId: 1, folderId: 1 });
-noteSchema.index({ folderId: 1, order: 1 });
 noteSchema.index({ userId: 1, updatedAt: -1 }); // 用于获取用户最近的笔记
 
 // 确保文件夹内笔记标题唯一性

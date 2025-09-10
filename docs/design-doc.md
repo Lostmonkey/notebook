@@ -12,7 +12,7 @@
 ```
 
 ### 1.2 技术栈
-- **前端**: React 19, Material-UI, TipTap, Axios
+- **前端**: React 19, Material-UI, TipTap, Zustand, TanStack Query, Ky
 - **后端**: Node.js, Express.js, Mongoose
 - **数据库**: MongoDB Atlas
 - **部署**: 阿里云函数计算
@@ -39,7 +39,6 @@
   name: String,           // 文件夹名称
   type: String,           // "system" | "user"
   userId: ObjectId,       // 所属用户ID
-  order: Number,          // 显示顺序
   createdAt: Date,
   updatedAt: Date
 }
@@ -53,7 +52,6 @@
   content: Object,        // TipTap JSON格式内容
   folderId: ObjectId,     // 所属文件夹ID
   userId: ObjectId,       // 所属用户ID
-  order: Number,          // 文件夹内显示顺序
   createdAt: Date,
   updatedAt: Date
 }
@@ -66,11 +64,10 @@ db.users.createIndex({ "username": 1 }, { unique: true })
 
 // 文件夹索引
 db.folders.createIndex({ "userId": 1, "type": 1 })
-db.folders.createIndex({ "userId": 1, "order": 1 })
 
 // 笔记索引
 db.notes.createIndex({ "userId": 1, "folderId": 1 })
-db.notes.createIndex({ "folderId": 1, "order": 1 })
+db.notes.createIndex({ "userId": 1, "updatedAt": -1 })
 ```
 
 ## 3. API设计
@@ -98,6 +95,37 @@ db.notes.createIndex({ "folderId": 1, "order": 1 })
 }
 ```
 
+#### GET /api/auth/profile
+**请求头:**
+```
+Authorization: Bearer <token>
+```
+**响应:**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "string",
+    "username": "string",
+    "createdAt": "string",
+    "updatedAt": "string"
+  }
+}
+```
+
+#### POST /api/auth/logout
+**请求头:**
+```
+Authorization: Bearer <token>
+```
+**响应:**
+```json
+{
+  "success": true,
+  "message": "登出成功"
+}
+```
+
 ### 3.2 文件夹管理
 
 #### GET /api/folders
@@ -110,8 +138,7 @@ db.notes.createIndex({ "folderId": 1, "order": 1 })
       "_id": "string",
       "name": "string",
       "type": "system|user",
-      "order": "number",
-      "notesCount": "number"
+      "order": "number"
     }
   ]
 }
@@ -153,7 +180,6 @@ db.notes.createIndex({ "folderId": 1, "order": 1 })
     {
       "_id": "string",
       "title": "string",
-      "order": "number",
       "updatedAt": "string"
     }
   ]
@@ -196,25 +222,14 @@ db.notes.createIndex({ "folderId": 1, "order": 1 })
 
 #### DELETE /api/notes/:id
 
-### 3.4 AI接口 (预留)
-
-#### POST /api/ai/suggest
+#### PUT /api/notes/:id/move
 **请求体:**
 ```json
 {
-  "content": "string",
-  "context": "string"
+  "targetFolderId": "string"
 }
 ```
 
-#### POST /api/ai/enhance
-**请求体:**
-```json
-{
-  "content": "string",
-  "action": "string"
-}
-```
 
 ## 4. 前端架构设计
 
@@ -245,52 +260,34 @@ src/
 │   ├── authService.js
 │   ├── folderService.js
 │   └── noteService.js
-├── store/               # 状态管理
-│   ├── authSlice.js
-│   ├── notebookSlice.js
-│   └── store.js
+├── stores/              # 状态管理
+│   └── useNotebookStore.ts
 └── utils/               # 工具函数
     ├── constants.js
     └── helpers.js
 ```
 
-### 4.2 状态管理 (Redux Toolkit)
+### 4.2 状态管理 (Zustand + TanStack Query)
 
-#### 4.2.1 Auth State
-```javascript
+#### 4.2.1 Client State (Zustand)
+```typescript
 {
-  user: {
-    id: string,
-    username: string
-  },
-  token: string,
+  user: User | null,
   isAuthenticated: boolean,
-  loading: boolean
+  selectedFolder: string | null,
+  selectedNote: string | null,
+  setUser: (user: User | null) => void,
+  setSelectedFolder: (folderId: string | null) => void,
+  setSelectedNote: (noteId: string | null) => void,
+  logout: () => void
 }
 ```
 
-#### 4.2.2 Notebook State
-```javascript
-{
-  folders: [
-    {
-      id: string,
-      name: string,
-      type: string,
-      notes: array
-    }
-  ],
-  currentNote: {
-    id: string,
-    title: string,
-    content: object,
-    folderId: string
-  },
-  selectedFolderId: string,
-  loading: boolean,
-  error: string
-}
-```
+#### 4.2.2 Server State (TanStack Query)
+- Folders: `['folders']`
+- Notes by folder: `['notes', folderId]`  
+- Note detail: `['note', noteId]`
+- User profile: `['auth', 'profile']`
 
 ### 4.3 TipTap编辑器配置
 
@@ -355,8 +352,7 @@ server/
 ├── routes/              # 路由定义
 │   ├── auth.js
 │   ├── folders.js
-│   ├── notes.js
-│   └── ai.js
+│   └── notes.js
 ├── middleware/          # 中间件
 │   ├── auth.js
 │   ├── validation.js

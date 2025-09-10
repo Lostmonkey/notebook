@@ -7,12 +7,9 @@ class NoteController {
       const { folderId } = req.params;
       const { page, limit } = req.query;
       
-      const result = await noteService.getNotesByFolder(folderId, req.user.userId, {
-        page: parseInt(page) || 1,
-        limit: parseInt(limit) || 50
-      });
+      const notes = await noteService.getNotesByFolder(folderId, req.user.userId);
       
-      return ApiResponse.success(res, result, '获取笔记列表成功');
+      return ApiResponse.success(res, notes, '获取笔记列表成功');
     } catch (error) {
       next(error);
     }
@@ -83,52 +80,7 @@ class NoteController {
     }
   }
   
-  async reorderNotes(req, res, next) {
-    try {
-      const { folderId } = req.params;
-      const { noteOrders } = req.body;
-      
-      if (!Array.isArray(noteOrders)) {
-        return ApiResponse.badRequest(res, 'noteOrders必须是数组');
-      }
-      
-      const result = await noteService.reorderNotes(folderId, req.user.userId, noteOrders);
-      
-      return ApiResponse.success(res, result, '笔记排序成功');
-    } catch (error) {
-      next(error);
-    }
-  }
   
-  async searchNotes(req, res, next) {
-    try {
-      const { q: query, page, limit } = req.query;
-      
-      if (!query || query.trim() === '') {
-        return ApiResponse.badRequest(res, '搜索关键词不能为空');
-      }
-      
-      const result = await noteService.searchNotes(req.user.userId, query.trim(), {
-        page: parseInt(page) || 1,
-        limit: parseInt(limit) || 20
-      });
-      
-      return ApiResponse.success(res, result, '搜索笔记成功');
-    } catch (error) {
-      next(error);
-    }
-  }
-  
-  async getRecentNotes(req, res, next) {
-    try {
-      const { limit } = req.query;
-      const notes = await noteService.getRecentNotes(req.user.userId, parseInt(limit) || 10);
-      
-      return ApiResponse.success(res, notes, '获取最近笔记成功');
-    } catch (error) {
-      next(error);
-    }
-  }
 }
 
 module.exports = new NoteController();

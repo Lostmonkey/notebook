@@ -15,7 +15,6 @@ const authRoutes = require('./routes/auth');
 const folderRoutes = require('./routes/folders');
 const noteRoutes = require('./routes/notes');
 const folderNoteRoutes = require('./routes/folderNotes');
-const aiRoutes = require('./routes/ai');
 
 const app = express();
 
@@ -88,7 +87,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/folders', folderRoutes);
 app.use('/api/folders', folderNoteRoutes); // 文件夹下的笔记路由
 app.use('/api/notes', noteRoutes);
-app.use('/api/ai', aiRoutes);
 
 // 根路径
 app.get('/', (req, res) => {
@@ -100,8 +98,7 @@ app.get('/', (req, res) => {
       health: '/health',
       auth: '/api/auth',
       folders: '/api/folders',
-      notes: '/api/notes',
-      ai: '/api/ai'
+      notes: '/api/notes'
     }
   });
 });

@@ -20,11 +20,6 @@ const folderSchema = new mongoose.Schema({
     required: [true, '用户ID是必需的'],
     index: true
   },
-  order: {
-    type: Number,
-    required: true,
-    default: 0
-  }
 }, {
   timestamps: true,
   collection: 'folders'
@@ -32,7 +27,6 @@ const folderSchema = new mongoose.Schema({
 
 // 创建复合索引
 folderSchema.index({ userId: 1, type: 1 });
-folderSchema.index({ userId: 1, order: 1 });
 
 // 虚拟字段：文件夹内的笔记
 folderSchema.virtual('notes', {
@@ -41,13 +35,6 @@ folderSchema.virtual('notes', {
   foreignField: 'folderId'
 });
 
-// 虚拟字段：笔记数量
-folderSchema.virtual('notesCount', {
-  ref: 'Note',
-  localField: '_id',
-  foreignField: 'folderId',
-  count: true
-});
 
 // 确保用户文件夹名称唯一性
 folderSchema.index(

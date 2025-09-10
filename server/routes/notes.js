@@ -7,11 +7,7 @@ const { validateNote, validateObjectId, validatePagination } = require('../middl
 // 所有路由都需要认证
 router.use(auth);
 
-// GET /api/notes/search - 搜索笔记
-router.get('/search', validatePagination, noteController.searchNotes);
 
-// GET /api/notes/recent - 获取最近笔记
-router.get('/recent', noteController.getRecentNotes);
 
 // GET /api/notes/:id - 获取笔记详情
 router.get('/:id', validateObjectId('id'), noteController.getNoteById);

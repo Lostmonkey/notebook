@@ -1,0 +1,79 @@
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--colorNeutralBackground1);
+  border-radius: var(--borderRadiusLarge);
+  box-shadow: var(--shadow2);
+  overflow: hidden;
+}
+
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--colorNeutralStroke2);
+  background: var(--colorNeutralBackground1);
+  min-height: 80px;
+  backdrop-filter: blur(20px);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.editor-title-section {
+  flex: 1;
+  max-width: 600px;
+  margin-right: 24px;
+}
+
+/* 标题输入框容器 */
+.editor-title-input {
+  width: 100%;
+}
+
+.editor-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingHorizontalM);
+}
+
+.save-status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingHorizontalXS);
+  padding: var(--spacingVerticalXXS) var(--spacingHorizontalS);
+  border-radius: var(--borderRadiusSmall);
+  background: var(--colorNeutralBackground2);
+}
+
+.editor-content {
+  flex: 1;
+  overflow: auto;
+  padding: var(--spacingVerticalXXL);
+  background: var(--colorNeutralBackground1);
+}
+
+.editor-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: var(--spacingVerticalL);
+  color: var(--colorNeutralForeground3);
+  text-align: center;
+  background: var(--colorNeutralBackground2);
+  border-radius: var(--borderRadiusXLarge);
+  padding: var(--spacingVerticalNone) var(--spacingHorizontalNone);
+  margin: var(--spacingVerticalXXL);
+}
+
+.editor-loading {
+  padding: var(--spacingVerticalXXL);
+}
+
+.editor-error {
+  padding: var(--spacingVerticalXXL);
+}

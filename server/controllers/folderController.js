@@ -58,21 +58,6 @@ class FolderController {
     }
   }
   
-  async reorderFolders(req, res, next) {
-    try {
-      const { folderOrders } = req.body;
-      
-      if (!Array.isArray(folderOrders)) {
-        return ApiResponse.badRequest(res, 'folderOrders必须是数组');
-      }
-      
-      const folders = await folderService.reorderFolders(req.user.userId, folderOrders);
-      
-      return ApiResponse.success(res, folders, '文件夹排序成功');
-    } catch (error) {
-      next(error);
-    }
-  }
 }
 
 module.exports = new FolderController();

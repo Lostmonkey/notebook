@@ -1,0 +1,116 @@
+.folder-node {
+  margin: 2px 4px;
+}
+
+.folder-header {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  gap: 8px;
+  min-height: 36px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.folder-header:hover {
+  background-color: var(--colorNeutralBackground1Hover);
+  transform: translateX(2px);
+}
+
+/* 移除文件夹选中状态样式 */
+
+.folder-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.add-note-btn,
+.more-btn {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.folder-header:hover .add-note-btn,
+.folder-header:hover .more-btn {
+  opacity: 1;
+}
+
+.notes-list {
+  margin-left: 24px;
+  padding-left: 12px;
+  border-left: 2px solid var(--colorNeutralStroke3);
+  margin-top: 4px;
+}
+
+.note-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin: 2px 0;
+  min-height: 32px;
+  transition: all 0.2s ease;
+  position: relative;
+  cursor: pointer;
+}
+
+.note-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding: 2px 0;
+}
+
+.note-item:hover {
+  background-color: var(--colorNeutralBackground1Hover);
+  transform: translateX(2px);
+}
+
+.note-item.selected {
+  background-color: var(--colorBrandBackground2);
+  color: var(--colorBrandForeground1);
+  box-shadow: var(--shadow2);
+}
+
+.note-item.selected .note-more-btn {
+  opacity: 1;
+}
+
+.note-item.selected::before {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 16px;
+  background-color: var(--colorBrandBackground);
+  border-radius: 2px;
+}
+
+.note-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.note-more-btn {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.note-item:hover .note-more-btn {
+  opacity: 1;
+}

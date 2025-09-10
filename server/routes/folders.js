@@ -22,7 +22,5 @@ router.put('/:id', validateObjectId('id'), validateFolder, folderController.upda
 // DELETE /api/folders/:id - 删除文件夹
 router.delete('/:id', validateObjectId('id'), folderController.deleteFolder);
 
-// PUT /api/folders/reorder - 文件夹排序
-router.put('/reorder', folderController.reorderFolders);
 
 module.exports = router;

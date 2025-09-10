@@ -21,10 +21,5 @@ router.post('/:folderId/notes',
   noteController.createNote
 );
 
-// PUT /api/folders/:folderId/notes/reorder - 文件夹内笔记排序
-router.put('/:folderId/notes/reorder', 
-  validateObjectId('folderId'), 
-  noteController.reorderNotes
-);
 
 module.exports = router;

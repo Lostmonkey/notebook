@@ -17,12 +17,8 @@ class AuthController {
   async getProfile(req, res, next) {
     try {
       const user = await userService.getUserProfile(req.user.userId);
-      const stats = await userService.getUserStats(req.user.userId);
       
-      return ApiResponse.success(res, {
-        ...user.toObject(),
-        stats
-      }, '获取用户信息成功');
+      return ApiResponse.success(res, user.toObject(), '获取用户信息成功');
     } catch (error) {
       next(error);
     }

@@ -5,21 +5,10 @@ class FolderService {
   async getUserFolders(userId) {
     try {
       const folders = await Folder.find({ userId })
-        .sort({ order: 1 })
+        .sort({ type: 1, createdAt: 1 }) // 系统文件夹在前，按创建时间排序
         .select('-__v');
       
-      // 获取每个文件夹的笔记数量
-      const foldersWithCount = await Promise.all(
-        folders.map(async (folder) => {
-          const notesCount = await Note.countDocuments({ folderId: folder._id });
-          return {
-            ...folder.toObject(),
-            notesCount
-          };
-        })
-      );
-      
-      return foldersWithCount;
+      return folders.map(folder => folder.toObject());
     } catch (error) {
       console.error('获取用户文件夹失败:', error);
       throw error;
@@ -31,29 +20,20 @@ class FolderService {
       // 检查文件夹名是否已存在
       const existingFolder = await Folder.findOne({ userId, name, type: 'user' });
       if (existingFolder) {
-        throw new Error('文件夹名称已存在');
+        const error = new Error('文件夹名称已存在');
+        error.statusCode = 409;
+        throw error;
       }
-      
-      // 获取最大排序值
-      const maxOrder = await Folder.findOne({ userId })
-        .sort({ order: -1 })
-        .select('order');
-      
-      const order = maxOrder ? maxOrder.order + 1 : 4; // 系统文件夹占用1-3
       
       const folder = new Folder({
         name,
         type: 'user',
-        userId,
-        order
+        userId
       });
       
       await folder.save();
       
-      return {
-        ...folder.toObject(),
-        notesCount: 0
-      };
+      return folder.toObject();
     } catch (error) {
       console.error('创建文件夹失败:', error);
       throw error;
@@ -65,11 +45,15 @@ class FolderService {
       const folder = await Folder.findOne({ _id: folderId, userId });
       
       if (!folder) {
-        throw new Error('文件夹不存在');
+        const error = new Error('文件夹不存在');
+        error.statusCode = 404;
+        throw error;
       }
       
       if (folder.type === 'system') {
-        throw new Error('系统文件夹不允许修改');
+        const error = new Error('系统文件夹不允许修改');
+        error.statusCode = 403;
+        throw error;
       }
       
       // 如果更新名称，检查是否重复
@@ -82,7 +66,9 @@ class FolderService {
         });
         
         if (existingFolder) {
-          throw new Error('文件夹名称已存在');
+          const error = new Error('文件夹名称已存在');
+          error.statusCode = 409;
+          throw error;
         }
       }
       
@@ -92,13 +78,7 @@ class FolderService {
         { new: true, runValidators: true }
       ).select('-__v');
       
-      // 获取笔记数量
-      const notesCount = await Note.countDocuments({ folderId });
-      
-      return {
-        ...updatedFolder.toObject(),
-        notesCount
-      };
+      return updatedFolder.toObject();
     } catch (error) {
       console.error('更新文件夹失败:', error);
       throw error;
@@ -110,17 +90,23 @@ class FolderService {
       const folder = await Folder.findOne({ _id: folderId, userId });
       
       if (!folder) {
-        throw new Error('文件夹不存在');
+        const error = new Error('文件夹不存在');
+        error.statusCode = 404;
+        throw error;
       }
       
       if (folder.type === 'system') {
-        throw new Error('系统文件夹不允许删除');
+        const error = new Error('系统文件夹不允许删除');
+        error.statusCode = 403;
+        throw error;
       }
       
       // 检查文件夹下是否有笔记
       const noteCount = await Note.countDocuments({ folderId });
       if (noteCount > 0) {
-        throw new Error('文件夹中还有笔记，请先删除所有笔记');
+        const error = new Error('文件夹中还有笔记，请先删除所有笔记');
+        error.statusCode = 409;
+        throw error;
       }
       
       await Folder.findByIdAndDelete(folderId);
@@ -132,38 +118,18 @@ class FolderService {
     }
   }
   
-  async reorderFolders(userId, folderOrders) {
-    try {
-      const updates = folderOrders.map(({ folderId, order }) => ({
-        updateOne: {
-          filter: { _id: folderId, userId, type: 'user' },
-          update: { order }
-        }
-      }));
-      
-      await Folder.bulkWrite(updates);
-      
-      return await this.getUserFolders(userId);
-    } catch (error) {
-      console.error('文件夹排序失败:', error);
-      throw error;
-    }
-  }
   
   async getFolderById(folderId, userId) {
     try {
       const folder = await Folder.findOne({ _id: folderId, userId }).select('-__v');
       
       if (!folder) {
-        throw new Error('文件夹不存在');
+        const error = new Error('文件夹不存在');
+        error.statusCode = 404;
+        throw error;
       }
       
-      const notesCount = await Note.countDocuments({ folderId });
-      
-      return {
-        ...folder.toObject(),
-        notesCount
-      };
+      return folder.toObject();
     } catch (error) {
       console.error('获取文件夹详情失败:', error);
       throw error;

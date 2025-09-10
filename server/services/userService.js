@@ -48,9 +48,9 @@ class UserService {
   
   async createSystemFolders(userId) {
     const systemFolders = [
-      { name: '单词表', type: 'system', userId, order: 1 },
-      { name: '例句集', type: 'system', userId, order: 2 },
-      { name: '素材库', type: 'system', userId, order: 3 }
+      { name: '单词表', type: 'system', userId },
+      { name: '例句集', type: 'system', userId },
+      { name: '素材库', type: 'system', userId }
     ];
     
     try {
@@ -66,7 +66,9 @@ class UserService {
     try {
       const user = await User.findById(userId).select('-__v');
       if (!user) {
-        throw new Error('用户不存在');
+        const error = new Error('用户不存在');
+        error.statusCode = 404;
+        throw error;
       }
       
       return user;
@@ -76,24 +78,6 @@ class UserService {
     }
   }
   
-  async getUserStats(userId) {
-    try {
-      const [folderCount, noteCount] = await Promise.all([
-        Folder.countDocuments({ userId }),
-        require('../models/Note').countDocuments({ userId })
-      ]);
-      
-      return {
-        folderCount,
-        noteCount,
-        systemFolderCount: await Folder.countDocuments({ userId, type: 'system' }),
-        userFolderCount: await Folder.countDocuments({ userId, type: 'user' })
-      };
-    } catch (error) {
-      console.error('获取用户统计失败:', error);
-      throw error;
-    }
-  }
 }
 
 module.exports = new UserService();
