@@ -5,7 +5,6 @@ class NoteController {
   async getNotesByFolder(req, res, next) {
     try {
       const { folderId } = req.params;
-      const { page, limit } = req.query;
       
       const notes = await noteService.getNotesByFolder(folderId, req.user.userId);
       
